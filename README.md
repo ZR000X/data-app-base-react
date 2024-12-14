@@ -115,6 +115,8 @@ src/
 
 ## 🎯 Creating Your First Action
 
+0. Rename the `actions-init` folder to `actions`
+
 1. In `src/actions/index.js`, add your action:
 
 ```javascript
