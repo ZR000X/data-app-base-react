@@ -6,7 +6,7 @@ A ridiculously simple barebones framework for building data-first, state-transit
 
 ## Why does it exist?
 
-I created something like this to model a MongoDB application that I was designing. At the time I was used to building applications with a more traditional SQL database, where I could think less about backend code and focus on the tables and relationships and SQL interface between backend code and database stored procedures. I build a framework for that as well.
+I created something like this to model a MongoDB application that I was designing. At the time I was used to building applications with a more traditional SQL database, where I could think less about backend code and focus on the tables and relationships and SQL interface between backend code and database stored procedures. I built a framework for that as well.
 
 At some point I realised that I could build something that allowed me to write javascript code that would be executed in a node.js environment, and that would allow me to model the application state and actions in a way that would be easy to understand and modify. This way I could focus on the data and the business logic I was trying to model, writing the CRUD operations and validations, hence designing the data with some assurance that it wasn't too far away from a reasonable, implementable design.
 
@@ -37,7 +37,7 @@ Your application's local state is a JSON object. Every action operates on this s
 
 ### Actions
 
-Actions are functions that product a new state and JSON response from the current state and JSON payload:
+Actions are functions that produce a new state and JSON response from the current state and JSON payload:
 
 ```javascript
 const myAction = (payload, state) => {
@@ -53,7 +53,28 @@ const myAction = (payload, state) => {
 
 ### Logging
 
-The framework provides a logging feature which is a function that can be imported into any action and called during execution of the action to emit a log message. This is useful for debugging and tracking the state of the application. It is important to note that actions can run other actions. While responses are only provided on completion of the initial action that was called, logs are emitted during the execution of any action.
+The framework includes a built-in logging system that helps track the execution flow of your actions. Key features include:
+
+- Log messages can be emitted during any action's execution
+- Nested action calls are properly tracked in the log
+- While only the initial action returns a response, all actions (including nested ones) can generate logs
+- Logs are useful for debugging, auditing, and understanding the execution path
+
+Example usage:
+
+```javascript
+const myAction = (payload, state, { log }) => {
+  log("Starting action execution");
+
+  // Your action logic here
+
+  log("Action completed successfully");
+  return {
+    response: "Success",
+    newState: state,
+  };
+};
+```
 
 ## 🛠️ Getting Started
 
