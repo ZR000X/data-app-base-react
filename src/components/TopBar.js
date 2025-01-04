@@ -9,7 +9,7 @@ const TopBar = ({ darkMode, onToggleDarkMode }) => {
       <Toolbar>
         <CodeIcon sx={{ mr: 2, color: "primary.main" }} />
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Condorgreen Beyond Mobile JSON State Machine (Data Design Devtool)
+          JSON State Machine
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <IconButton onClick={onToggleDarkMode} color="inherit">
