@@ -9,7 +9,7 @@ const TopBar = ({ darkMode, onToggleDarkMode }) => {
       <Toolbar>
         <CodeIcon sx={{ mr: 2, color: "primary.main" }} />
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          JSON State Machine
+          Data System Base (React JS)
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <IconButton onClick={onToggleDarkMode} color="inherit">

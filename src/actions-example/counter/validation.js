@@ -1,5 +1,5 @@
 /**
- * Example validation function showing how to validate action payloads.
+ * @param {{ name?: string; amount?: number; initialValue?: number; }} payload
  */
 export const validateCounter = (payload) => {
   // Validate name
