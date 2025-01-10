@@ -35,6 +35,7 @@ function App() {
   const [selectedSystem, setSelectedSystem] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
   const [masterState, setMasterState] = useState(getInitialMasterState);
+  const [filename, setFilename] = useState("app-state.json");
 
   // Update selected system and node when world changes
   const handleWorldChange = (world) => {
@@ -107,6 +108,9 @@ function App() {
         const text = await file.text();
         const newState = JSON.parse(text);
 
+        // Set filename from uploaded file
+        setFilename(file.name);
+
         // First update all nodes' states
         worlds.forEach((world) => {
           world.systems.forEach((system, systemName) => {
@@ -151,7 +155,7 @@ function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "app-state.json";
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -168,27 +172,53 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-        <Box sx={{ position: "fixed", top: 16, right: 72, zIndex: 1200 }}>
+        <Box
+          sx={{
+            height: "32px",
+            bgcolor: "background.paper",
+            borderBottom: 1,
+            borderColor: "divider",
+            display: "flex",
+            alignItems: "center",
+            px: 2,
+            gap: 1,
+          }}
+        >
           <input
-            type="file"
-            id="state-upload"
-            style={{ display: "none" }}
-            accept="application/json"
-            onChange={handleUpload}
+            value={filename}
+            onChange={(e) => setFilename(e.target.value)}
+            style={{
+              border: "none",
+              background: "none",
+              flexGrow: 1,
+              fontSize: "0.875rem",
+              color: "inherit",
+              outline: "none",
+            }}
           />
-          <Tooltip title="Upload State">
-            <IconButton
-              color="primary"
-              onClick={() => document.getElementById("state-upload").click()}
-            >
-              <UploadIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Download State">
-            <IconButton color="primary" onClick={handleDownload}>
-              <DownloadIcon />
-            </IconButton>
-          </Tooltip>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <input
+              type="file"
+              id="state-upload"
+              style={{ display: "none" }}
+              accept="application/json"
+              onChange={handleUpload}
+            />
+            <Tooltip title="Upload State">
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={() => document.getElementById("state-upload").click()}
+              >
+                <UploadIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Download State">
+              <IconButton size="small" color="primary" onClick={handleDownload}>
+                <DownloadIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
         <TopBar
           worlds={worlds}
