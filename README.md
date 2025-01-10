@@ -4,195 +4,202 @@
 
 A ridiculously simple barebones framework for building data-first, state-transition focused applications. Perfect for developers who think in terms of data structures and transformations first, UI second.
 
-## Why does it exist?
+## Core Concepts
 
-I created something like this to model a MongoDB application that I was designing. At the time I was used to building applications with a more traditional SQL database, where I could think less about backend code and focus on the tables and relationships and SQL interface between backend code and database stored procedures. I built a framework for that as well.
+### Worlds, Systems, and Nodes
 
-At some point I realised that I could build something that allowed me to write javascript code that would be executed in a node.js environment, and that would allow me to model the application state and actions in a way that would be easy to understand and modify. This way I could focus on the data and the business logic I was trying to model, writing the CRUD operations and validations, hence designing the data with some assurance that it wasn't too far away from a reasonable, implementable design.
+The framework is organized hierarchically:
 
-The functional UI that is pre-built gives you a very simple way to perform actions against your data state, so you can see what the logic you've coded up actually does. By being able to simply manipulate the state manually as well, it provides a great playground to simulate the data flows you want to model.
+- **Worlds**: Top-level containers that group related systems
+- **Systems**: Collections of related nodes (e.g., "character system", "inventory system")
+- **Nodes**: Individual state containers with their own actions
 
-This all works well when you're focused on the data and are not too concerned about the UI. For some applications this is all you need. The UI then bends to the data and the logic you've designed. After designing your data logic and the actions you want to perform on it, you can then build the UI to match and make it more user-friendly, which beautiful views, themselves just actions, that offer the user intuitive ways to interact with the data.
+Example:
 
-There are other ideas for testing, using AI agents to explore the data space, and other ideas for how to make this more useful, but this is a good start.
+```javascript
+// Define a node with actions
+export class CharacterNode extends Node {
+  constructor(name) {
+    super(name, [levelUpAction, gainExperienceAction], {
+      level: 1,
+      experience: 0,
+      strength: 10,
+      dexterity: 10,
+      intelligence: 10,
+    });
+  }
+}
 
-## 🤔 Is This Framework For You?
+// Create a system with nodes
+export class CharacterSystem extends System {
+  constructor() {
+    super("character", [createCharacterNode("character")]);
+  }
+}
 
-This framework is ideal if you:
-
-- Prefer to think about data structures and state transitions before UI
-- Want to build complex business logic with rigorous validation
-- Need to maintain a clear audit trail of state changes
-- Want to focus on business logic while getting a functional UI "for free"
-
-It might not be for you if:
-
-- You prefer UI-first development
-
-## 🚀 Core Concepts
-
-### State
-
-Your application's local state is a JSON object. Every action operates on this state with some payload, producing a new state.
+// Create a world with systems
+const gameWorld = new World("game", [new CharacterSystem()]);
+```
 
 ### Actions
 
-Actions are functions that produce a new state and JSON response from the current state and JSON payload:
+Actions are the core building blocks that transform state. They:
+
+- Accept a payload and current state
+- Return a new state and response
+- Can emit logs during execution
+- Include parameter definitions for validation
+
+Example Action:
 
 ```javascript
-const myAction = (payload, state) => {
-  // Transform state based on payload
-  const newState = { ...state, someField: payload.value };
+class LevelUpAction extends Action {
+  constructor() {
+    const params = {
+      statPoints: {
+        type: "number",
+        description: "Number of stat points to allocate",
+        default: 1,
+        required: true,
+      },
+      attribute: {
+        type: "string",
+        description:
+          "Attribute to increase (strength, dexterity, intelligence)",
+        default: "strength",
+        required: true,
+      },
+    };
+    super("levelUp", params);
+  }
 
-  return {
-    response: "Action completed successfully",
-    newState,
-  };
-};
+  execute({ state, payload }) {
+    // Validation
+    if (!validAttributes.includes(payload.attribute)) {
+      throw new Error(`Invalid attribute: ${payload.attribute}`);
+    }
+
+    // State transformation
+    const newState = {
+      ...state,
+      level: state.level + 1,
+      [payload.attribute]: state[payload.attribute] + payload.statPoints,
+    };
+
+    // Logging
+    log(`Character leveled up to ${newState.level}!`);
+
+    return {
+      state: newState,
+      response: `Leveled up to ${newState.level}`,
+    };
+  }
+}
 ```
 
 ### Logging
 
-The framework includes a built-in logging system that helps track the execution flow of your actions. Key features include:
+Built-in logging system for tracking action execution:
 
-- Log messages can be emitted during any action's execution
-- Nested action calls are properly tracked in the log
-- While only the initial action returns a response, all actions (including nested ones) can generate logs
-- Logs are useful for debugging, auditing, and understanding the execution path
-
-Example usage:
+- Automatic ID generation
+- Timestamp tracking
+- Support for different log levels (info, warning, error)
+- Reverse chronological display
 
 ```javascript
-const myAction = (payload, state, { log }) => {
-  log("Starting action execution");
-
-  // Your action logic here
-
-  log("Action completed successfully");
-  return {
-    response: "Success",
-    newState: state,
-  };
-};
+log(`Gained ${amount} experience from ${source}`);
+log(`Level up available!`, "warning");
+log(`Invalid operation`, "error");
 ```
 
-## 🛠️ Getting Started
+## Getting Started
 
-1. Clone the repository:
-
-```bash
-git clone <your-repo-url>
-cd <repo-name>
-```
-
-2. Initialize your actions:
+1. Clone and install:
 
 ```bash
-cp -r src/actions-init src/actions
-```
-
-3. Install dependencies:
-
-```bash
+git clone <repository-url>
+cd data-system-base
 npm install
 ```
 
-4. Start the development server:
+2. Start the development server:
 
 ```bash
 npm start
 ```
 
-## 📁 Project Structure
-
-```
-src/
-  ├── actions/          # Template actions to get started
-  ├── core/             # Core framework code
-  ├── utils/            # Utility functions
-  └── ui/               # Pre-built UI components
-```
-
-## 🎯 Creating Your First Action
-
-0. Rename the `actions-init` folder to `actions`
-
-1. In `src/actions/index.js`, add your action:
+3. Create your first world:
 
 ```javascript
-export const actions = {
-  myAction: {
-    handler: myAction,
-    label: "My First Action",
-    category: "Custom",
-    description: "Does something awesome",
-    params: {
-      field1: {
-        type: "string",
-        description: "An important field",
-        required: true,
-      },
-    },
-  },
-};
+// src/worlds/myWorld/index.js
+import { World } from "../../core/World";
+import { MySystem } from "./systems/mySystem";
+
+const systems = [new MySystem()];
+export const myWorld = new World("myWorld", systems);
 ```
 
-2. Create your action handler:
+## Example Worlds
 
-```javascript
-const myAction = (payload, state) => {
-  // Validate
-  validateMyAction(payload, state);
+The framework includes two example worlds:
 
-  // Transform state
-  const newState = {
-    ...state,
-    myField: payload.field1,
-  };
+### 1. Counter World
 
-  return {
-    response: "Action completed",
-    newState,
-  };
-};
-```
+A simple example demonstrating basic state management:
 
-## 🧪 Testing Actions
+- Single increment action
+- Numeric state tracking
+- Basic logging
 
-The framework provides a built-in playground to test your actions:
+### 2. Game World
 
-1. Select your action from the dropdown
-2. Configure the payload in the JSON editor
-3. Click "Execute" to run the action
-4. View the state changes in real-time
+A more complex example showing:
 
-## 🎨 UI Generation
+- Multiple interdependent actions (levelUp, gainExperience)
+- Rich parameter definitions
+- State validation
+- Complex business logic
+- Multi-level logging
 
-The framework automatically generates a functional UI based on your actions and state:
+## UI Features
 
-- Action selection dropdown
-- JSON editors for payload and state
-- Response visualization
-- State history browser
+The framework provides a built-in UI with:
+
+- World/System/Node navigation
+- Action selection with parameter validation
+- JSON state editor
+- Action parameter documentation
+- Real-time logging
 - Dark/light theme support
 
-## 📚 Example Applications
+## Best Practices
 
-Check out these examples in the `examples/` directory:
+1. **Action Design**
 
-- Product Catalog Manager
-- Workflow Engine
-- Document Processor
-- Configuration Manager
+   - Define clear parameter specifications
+   - Include meaningful descriptions
+   - Set sensible defaults
+   - Validate inputs
 
-## 🤝 Contributing
+2. **State Management**
+
+   - Keep state immutable
+   - Validate state transitions
+   - Use logging to track changes
+
+3. **Error Handling**
+   - Throw descriptive errors
+   - Use appropriate log levels
+   - Validate early, fail fast
+
+## Contributing
+
+Contributions are welcome! Please:
 
 1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+2. Create a feature branch
+3. Submit a pull request
 
-## 📝 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see LICENSE file for details
