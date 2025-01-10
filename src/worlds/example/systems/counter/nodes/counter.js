@@ -7,5 +7,4 @@ export class CounterNode extends Node {
   }
 }
 
-// Export a factory function to create new instances
 export const createCounterNode = (name) => new CounterNode(name);

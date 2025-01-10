@@ -9,14 +9,28 @@
  * @property {boolean} [required]
  */
 
+/**
+ * @typedef {Object} TestCase
+ * @property {Object} input
+ * @property {State} input.state Initial state
+ * @property {Object} input.payload Action payload
+ * @property {Object} output
+ * @property {State} output.state Expected final state
+ * @property {string} output.response Expected response
+ */
+
 export class Action {
   /**
    * @param {string} name
-   * @param {Record<string, ParamDefinition>} params
+   * @param {Object} params Parameter definitions
+   * @param {function} handler Function that executes the action
+   * @param {TestCase[]} tests Array of test cases
    */
-  constructor(name, params = {}) {
+  constructor(name, params, handler, tests) {
     this.name = name;
     this.params = params;
+    this.handler = handler;
+    this.tests = tests;
   }
 
   getName() {
@@ -27,12 +41,7 @@ export class Action {
     return this.params;
   }
 
-  /**
-   * @returns {Object} Default payload with all parameters set to their default values
-   */
   getDefaultPayload() {
-    console.log("Getting default payload for:", this.name);
-    console.log("Params:", this.params);
     const payload = {};
     Object.entries(this.params).forEach(([key, param]) => {
       payload[key] = param.default !== undefined ? param.default : null;
@@ -41,6 +50,13 @@ export class Action {
   }
 
   execute(context) {
-    throw new Error("Action.execute() must be implemented by subclass");
+    return this.handler(context);
+  }
+
+  /**
+   * @returns {TestCase[]}
+   */
+  getTests() {
+    return this.tests;
   }
 }
