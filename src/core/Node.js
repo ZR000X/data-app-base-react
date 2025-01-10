@@ -1,22 +1,18 @@
 /**
  * @typedef {import('../types').State} State
+ * @typedef {import('./Action').Action} Action
  */
 
-export class DataSystem {
+export class Node {
   /**
-   * @param {Record<string, import('./Action').Action>} actions
+   * @param {string} name
+   * @param {Action[]} actions
    * @param {State} initialState
    */
-  constructor(actions, initialState) {
-    this.actions = new Map(Object.entries(actions));
+  constructor(name, actions, initialState = {}) {
+    this.name = name;
+    this.actions = new Map(actions.map((action) => [action.getName(), action]));
     this.state = initialState;
-  }
-
-  /**
-   * @returns {State}
-   */
-  getState() {
-    return this.state;
   }
 
   /**
@@ -27,10 +23,10 @@ export class DataSystem {
   }
 
   /**
-   * @returns {Map<string, import('./Action').Action>}
+   * @returns {State}
    */
-  getActions() {
-    return this.actions;
+  getState() {
+    return this.state;
   }
 
   /**
