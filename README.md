@@ -1,6 +1,6 @@
-# Game Engine UI
+# Interactive Data Design Tool
 
-A flexible UI for managing game state and systems through actions and nodes.
+A flexible web app data design tool for testing out underlying data structures and actions for any application.
 
 ## Setup
 
