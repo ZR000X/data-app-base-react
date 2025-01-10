@@ -128,11 +128,16 @@ export function TopBar({
   worlds,
   selectedWorld,
   onWorldChange,
+  selectedSystem,
+  onSystemChange,
+  selectedNode,
+  onNodeChange,
   darkMode,
   onToggleDarkMode,
+  onNodeStateChange,
+  getNodeState,
+  masterState,
 }) {
-  const [selectedSystem, setSelectedSystem] = useState(null);
-  const [selectedNode, setSelectedNode] = useState(null);
   const [actionResponse, setActionResponse] = useState(null);
   const [actionPayload, setActionPayload] = useState("{}");
   const [currentTab, setCurrentTab] = useState(0);
@@ -145,9 +150,24 @@ export function TopBar({
 
   useEffect(() => {
     if (selectedNode) {
-      setNodeState(JSON.stringify(selectedNode.getState(), null, 2));
+      console.log("Node selected/updated, getting state...");
+      const savedState = getNodeState(
+        selectedWorld.name,
+        selectedSystem.name,
+        selectedNode.name
+      );
+      console.log("Retrieved state:", savedState);
+      const stateToUse = savedState || selectedNode.getState();
+      setNodeState(JSON.stringify(stateToUse, null, 2));
     }
-  }, [selectedNode?.getState()]);
+  }, [
+    selectedNode,
+    selectedWorld.name,
+    selectedSystem?.name,
+    getNodeState,
+    masterState,
+    selectedNode?.getState(),
+  ]);
 
   useEffect(() => {
     setLogs(getLogs());
@@ -167,22 +187,16 @@ export function TopBar({
   const handleWorldChange = (event) => {
     const world = worlds.find((w) => w.name === event.target.value);
     onWorldChange(world);
-    setSelectedSystem(null);
-    setSelectedNode(null);
-    setActionResponse(null);
   };
 
   const handleSystemChange = (event) => {
     const system = selectedWorld.systems.get(event.target.value);
-    setSelectedSystem(system);
-    setSelectedNode(null);
-    setActionResponse(null);
+    onSystemChange(system);
   };
 
   const handleNodeChange = (event) => {
     const node = selectedSystem.nodes.get(event.target.value);
-    setSelectedNode(node);
-    setActionResponse(null);
+    onNodeChange(node);
   };
 
   const validateJson = (value, setError) => {
@@ -222,9 +236,15 @@ export function TopBar({
         actionType,
         JSON.parse(actionPayload)
       );
-      setActionResponse({ message: result.response, severity: "success" });
 
-      // State will be automatically updated via the useEffect
+      onNodeStateChange(
+        selectedWorld.name,
+        selectedSystem.name,
+        selectedNode.name,
+        result.state
+      );
+
+      setActionResponse({ message: result.response, severity: "success" });
     } catch (error) {
       setActionResponse({ message: error.message, severity: "error" });
     }
@@ -238,15 +258,21 @@ export function TopBar({
   const handleSaveState = () => {
     try {
       const newState = JSON.parse(nodeState);
-      console.log("Parsed state:", newState); // Debug log
       selectedNode.setState(newState);
+
+      onNodeStateChange(
+        selectedWorld.name,
+        selectedSystem.name,
+        selectedNode.name,
+        newState
+      );
+
       setActionResponse({
         message: "State updated successfully",
         severity: "success",
       });
       setStateError(false);
     } catch (error) {
-      console.error("Save state error:", error); // Debug log
       setActionResponse({
         message: `Invalid JSON format: ${error.message}`,
         severity: "error",

@@ -12,21 +12,30 @@ export class Node {
   constructor(name, actions, initialState = {}) {
     this.name = name;
     this.actions = new Map(actions.map((action) => [action.getName(), action]));
-    this.state = initialState;
+    this.initialState = initialState;
+    this.state = { ...initialState };
   }
 
   /**
-   * @param {State} state
+   * @returns {State}
    */
-  setState(state) {
-    this.state = state;
+  getInitialState() {
+    return this.initialState;
   }
 
   /**
    * @returns {State}
    */
   getState() {
-    return this.state;
+    return { ...this.state };
+  }
+
+  /**
+   * @param {State} state
+   */
+  setState(state) {
+    console.log(`Setting state for node ${this.name}:`, state);
+    this.state = { ...state };
   }
 
   /**
