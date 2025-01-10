@@ -1,205 +1,204 @@
-# Data System Base (React JS)
+# Game Engine UI
 
-## What is this?
+A flexible UI for managing game state and systems through actions and nodes.
 
-A ridiculously simple barebones framework for building data-first, state-transition focused applications. Perfect for developers who think in terms of data structures and transformations first, UI second.
+## Setup
 
-## Core Concepts
+### Prerequisites
 
-### Worlds, Systems, and Nodes
+- Node.js (v14 or higher)
+- npm or yarn
 
-The framework is organized hierarchically:
+### Installation
 
-- **Worlds**: Top-level containers that group related systems
-- **Systems**: Collections of related nodes (e.g., "character system", "inventory system")
-- **Nodes**: Individual state containers with their own actions
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/game-engine-ui.git
+cd game-engine-ui
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Start the development server:
+
+```bash
+npm start
+# or
+yarn start
+```
+
+The application will be available at `http://localhost:3000`
+
+### Development
+
+1. Create a new world in `src/worlds/`
+2. Define systems within your world
+3. Create nodes with actions
+4. Register your world in `src/App.js`
 
 Example:
 
 ```javascript
-// Define a node with actions
-export class CharacterNode extends Node {
-  constructor(name) {
-    super(name, [levelUpAction, gainExperienceAction], {
-      level: 1,
-      experience: 0,
-      strength: 10,
-      dexterity: 10,
-      intelligence: 10,
-    });
-  }
-}
-
-// Create a system with nodes
-export class CharacterSystem extends System {
-  constructor() {
-    super("character", [createCharacterNode("character")]);
-  }
-}
-
-// Create a world with systems
-const gameWorld = new World("game", [new CharacterSystem()]);
-```
-
-### Actions
-
-Actions are the core building blocks that transform state. They:
-
-- Accept a payload and current state
-- Return a new state and response
-- Can emit logs during execution
-- Include parameter definitions for validation
-
-Example Action:
-
-```javascript
-class LevelUpAction extends Action {
-  constructor() {
-    const params = {
-      statPoints: {
-        type: "number",
-        description: "Number of stat points to allocate",
-        default: 1,
-        required: true,
-      },
-      attribute: {
-        type: "string",
-        description:
-          "Attribute to increase (strength, dexterity, intelligence)",
-        default: "strength",
-        required: true,
-      },
-    };
-    super("levelUp", params);
-  }
-
-  execute({ state, payload }) {
-    // Validation
-    if (!validAttributes.includes(payload.attribute)) {
-      throw new Error(`Invalid attribute: ${payload.attribute}`);
-    }
-
-    // State transformation
-    const newState = {
-      ...state,
-      level: state.level + 1,
-      [payload.attribute]: state[payload.attribute] + payload.statPoints,
-    };
-
-    // Logging
-    log(`Character leveled up to ${newState.level}!`);
-
-    return {
-      state: newState,
-      response: `Leveled up to ${newState.level}`,
-    };
-  }
-}
-```
-
-### Logging
-
-Built-in logging system for tracking action execution:
-
-- Automatic ID generation
-- Timestamp tracking
-- Support for different log levels (info, warning, error)
-- Reverse chronological display
-
-```javascript
-log(`Gained ${amount} experience from ${source}`);
-log(`Level up available!`, "warning");
-log(`Invalid operation`, "error");
-```
-
-## Getting Started
-
-1. Clone and install:
-
-```bash
-git clone <repository-url>
-cd data-system-base
-npm install
-```
-
-2. Start the development server:
-
-```bash
-npm start
-```
-
-3. Create your first world:
-
-```javascript
-// src/worlds/myWorld/index.js
+// src/worlds/myworld/index.js
 import { World } from "../../core/World";
-import { MySystem } from "./systems/mySystem";
+import { MySystem } from "./systems/mysystem";
 
-const systems = [new MySystem()];
-export const myWorld = new World("myWorld", systems);
+export const myWorld = new World("myworld", [new MySystem()]);
+
+// src/App.js
+import { myWorld } from "./worlds/myworld";
+
+const worlds = [myWorld];
 ```
 
-## Example Worlds
+## Features
 
-The framework includes two example worlds:
+### Core Functionality
 
-### 1. Counter World
+- Multiple worlds support
+- System and node-based architecture
+- Action-driven state management
+- Built-in test runner with visual results
+- Persistent state across sessions
+- Dark/light mode support
 
-A simple example demonstrating basic state management:
+### State Management
 
-- Single increment action
-- Numeric state tracking
-- Basic logging
+- Real-time state editing
+- JSON validation
+- State persistence across page refreshes
+- Import/export state functionality
+- Automatic state initialization for new nodes
+- State history through file saves
 
-### 2. Game World
+### Action System
 
-A more complex example showing:
+- Parameter validation
+- Default values
+- Required field checks
+- Interactive payload editor
+- Parameter documentation
+- Test cases for each action
 
-- Multiple interdependent actions (levelUp, gainExperience)
-- Rich parameter definitions
-- State validation
-- Complex business logic
-- Multi-level logging
+### Testing
 
-## UI Features
+- Built-in test runner
+- Visual test results
+- Pass/fail statistics
+- Detailed error reporting
+- Expected vs actual comparison
+- Test case documentation
 
-The framework provides a built-in UI with:
+### UI Features
 
-- World/System/Node navigation
-- Action selection with parameter validation
-- JSON state editor
-- Action parameter documentation
-- Real-time logging
-- Dark/light theme support
+- Monaco editor integration
+- JSON formatting
+- Error highlighting
+- Clipboard support
+- Responsive layout
+- System navigation
+- Action selection
+- Log viewer
+- Dark/light mode toggle
 
-## Best Practices
+## Architecture
 
-1. **Action Design**
+### Core Components
 
-   - Define clear parameter specifications
-   - Include meaningful descriptions
-   - Set sensible defaults
-   - Validate inputs
+- `World`: Container for systems
+- `System`: Container for nodes
+- `Node`: State container with actions
+- `Action`: State transformation with tests
 
-2. **State Management**
+### File Structure
 
-   - Keep state immutable
-   - Validate state transitions
-   - Use logging to track changes
+```
+src/
+  core/
+    Action.js     # Base action class with test runner
+    Node.js       # Node management
+    System.js     # System organization
+    World.js      # World container
+  worlds/
+    example/      # Example implementation
+      systems/
+        counter/  # Simple counter system
+        character/# Character management system
+```
 
-3. **Error Handling**
-   - Throw descriptive errors
-   - Use appropriate log levels
-   - Validate early, fail fast
+### State Structure
 
-## Contributing
+```json
+{
+  "worldName": {
+    "systemName": {
+      "nodeName": {
+        // Node state
+      }
+    }
+  }
+}
+```
 
-Contributions are welcome! Please:
+## Usage
 
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+### Creating an Action
 
-## License
+```javascript
+const action = new Action(
+  "actionName",
+  {
+    paramName: {
+      type: "string",
+      description: "Parameter description",
+      default: "defaultValue",
+      required: true,
+    },
+  },
+  handler,
+  tests
+);
+```
 
-MIT License - see LICENSE file for details
+### Creating a Node
+
+```javascript
+const node = new Node("nodeName", [action1, action2], initialState);
+```
+
+### Creating a System
+
+```javascript
+const system = new System("systemName", [node1, node2]);
+```
+
+### Creating a World
+
+```javascript
+const world = new World("worldName", [system1, system2]);
+```
+
+## State Management
+
+- States are automatically persisted to localStorage
+- States can be exported to JSON files
+- States can be imported from JSON files
+- Each node maintains its own state
+- States are initialized with defaults
+- States can be manually edited through the UI
+
+## Testing
+
+- Tests are defined per action
+- Tests run automatically on action creation
+- Tests verify state transformations
+- Tests verify action responses
+- Test results are visible in the UI
+- Failed tests show detailed comparisons
