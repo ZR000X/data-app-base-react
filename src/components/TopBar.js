@@ -24,6 +24,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SaveIcon from "@mui/icons-material/Save";
 import Editor from "@monaco-editor/react";
 import { getLogs, setLogCallback } from "../utils/logging";
+import TestResults from "./TestResults";
 
 function TabPanel({ children, value, index }) {
   return value === index ? <Box sx={{ p: 3 }}>{children}</Box> : null;
@@ -350,6 +351,7 @@ export function TopBar({
             >
               <Tab label="REQUEST/RESPONSE" />
               <Tab label="LOGS" />
+              <Tab label="TESTS" />
             </Tabs>
           </>
         )}
@@ -580,6 +582,10 @@ export function TopBar({
                 ))}
               </Box>
             </Paper>
+          </TabPanel>
+
+          <TabPanel value={currentTab} index={2}>
+            {selectedSystem && <TestResults system={selectedSystem} />}
           </TabPanel>
         </>
       )}
