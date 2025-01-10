@@ -4,9 +4,10 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import { TopBar } from "./components/TopBar";
 import { exampleWorld } from "./worlds/example";
+import { gameWorld } from "./worlds/game";
 
 // In a real app, you'd import multiple worlds
-const worlds = [exampleWorld];
+const worlds = [exampleWorld, gameWorld];
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
