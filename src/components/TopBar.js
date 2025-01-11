@@ -196,6 +196,19 @@ export function TopBar({
 
   const handleNodeChange = (event) => {
     const node = selectedSystem.nodes.get(event.target.value);
+
+    // Set up state change handler for the node
+    if (node) {
+      node.setStateChangeHandler((newState) => {
+        onNodeStateChange(
+          selectedWorld.name,
+          selectedSystem.name,
+          node.name,
+          newState
+        );
+      });
+    }
+
     onNodeChange(node);
   };
 
@@ -378,6 +391,7 @@ export function TopBar({
               <Tab label="REQUEST/RESPONSE" />
               <Tab label="LOGS" />
               <Tab label="TESTS" />
+              {selectedNode.getUI() && <Tab label="CLIENT UI" />}
             </Tabs>
           </>
         )}
@@ -612,6 +626,12 @@ export function TopBar({
 
           <TabPanel value={currentTab} index={2}>
             {selectedSystem && <TestResults system={selectedSystem} />}
+          </TabPanel>
+
+          <TabPanel value={currentTab} index={3}>
+            {selectedNode.getUI() && (
+              <Box sx={{ p: 2 }}>{selectedNode.getUI().render()}</Box>
+            )}
           </TabPanel>
         </>
       )}

@@ -1,10 +1,7 @@
 import { Node } from "../../../../../core/Node";
 import { incrementAction } from "../actions/increment";
+import { CounterUI } from "../ui/CounterUI";
 
-export class CounterNode extends Node {
-  constructor(name) {
-    super(name, [incrementAction], { count: 0 });
-  }
+export function createCounterNode(name) {
+  return new Node(name, [incrementAction], { count: 0 }, CounterUI);
 }
-
-export const createCounterNode = (name) => new CounterNode(name);

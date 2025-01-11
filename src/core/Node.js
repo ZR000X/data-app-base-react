@@ -8,12 +8,30 @@ export class Node {
    * @param {string} name
    * @param {Action[]} actions
    * @param {State} initialState
+   * @param {NodeUI} UI
    */
-  constructor(name, actions, initialState = {}) {
+  constructor(name, actions, initialState = {}, UI = null) {
     this.name = name;
     this.actions = new Map(actions.map((action) => [action.getName(), action]));
     this.initialState = initialState;
     this.state = { ...initialState };
+    this.UI = UI ? new UI(this) : null;
+    this.onStateChange = null;
+  }
+
+  /**
+   * Set handler for state changes
+   * @param {function} handler
+   */
+  setStateChangeHandler(handler) {
+    this.onStateChange = handler;
+  }
+
+  /**
+   * Get state change handler
+   */
+  getStateChangeHandler() {
+    return this.onStateChange;
   }
 
   /**
@@ -59,5 +77,12 @@ export class Node {
       response: result.response,
       newState: result.state,
     };
+  }
+
+  /**
+   * @returns {NodeUI}
+   */
+  getUI() {
+    return this.UI;
   }
 }

@@ -116,6 +116,17 @@ const worlds = [myWorld];
 - `System`: Container for nodes
 - `Node`: State container with actions
 - `Action`: State transformation with tests
+- `NodeUI`: Visual representation of node state
+
+### State Management Features
+
+- Real-time state synchronization across all views
+- Persistent storage in localStorage
+- Import/Export state as JSON files
+- State reset functionality
+- Automatic state initialization
+- Manual state editing
+- State history through file saves
 
 ### File Structure
 
@@ -126,6 +137,7 @@ src/
     Node.js       # Node management
     System.js     # System organization
     World.js      # World container
+    NodeUI.js     # Base UI class for nodes
   worlds/
     example/      # Example implementation
       systems/
@@ -133,18 +145,17 @@ src/
         character/# Character management system
 ```
 
-### State Structure
+### State Flow
 
-```json
-{
-  "worldName": {
-    "systemName": {
-      "nodeName": {
-        // Node state
-      }
-    }
-  }
-}
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   NodeUI    │    │    Node     │    │   Master    │
+│  Actions    │───>│    State    │───>│    State    │
+└─────────────┘    └─────────────┘    └─────────────┘
+                          ▲                   │
+                          │                   │
+                          └───────────────────┘
+                           State Persistence
 ```
 
 ## Usage
@@ -170,7 +181,7 @@ const action = new Action(
 ### Creating a Node
 
 ```javascript
-const node = new Node("nodeName", [action1, action2], initialState);
+const node = new Node("nodeName", [action1, action2], initialState, MyNodeUI);
 ```
 
 ### Creating a System
@@ -185,6 +196,28 @@ const system = new System("systemName", [node1, node2]);
 const world = new World("worldName", [system1, system2]);
 ```
 
+### Creating a NodeUI
+
+```javascript
+export class MyNodeUI extends NodeUI {
+  render() {
+    const state = this.getState();
+    // Access state values
+    const { value } = state;
+
+    // Execute actions
+    const handleAction = () => {
+      this.executeAction("actionName", { param: "value" });
+    };
+
+    return (
+      // Your React JSX here
+      <Button onClick={handleAction}>Current Value: {value}</Button>
+    );
+  }
+}
+```
+
 ## State Management
 
 - States are automatically persisted to localStorage
@@ -193,6 +226,10 @@ const world = new World("worldName", [system1, system2]);
 - Each node maintains its own state
 - States are initialized with defaults
 - States can be manually edited through the UI
+- States can be reset to initial values
+- States sync automatically between UI and actions
+- States persist across page refreshes
+- States can be downloaded/uploaded as JSON
 
 ## Testing
 
@@ -202,3 +239,42 @@ const world = new World("worldName", [system1, system2]);
 - Tests verify action responses
 - Test results are visible in the UI
 - Failed tests show detailed comparisons
+
+## UI System
+
+### Creating a NodeUI
+
+```javascript
+import { NodeUI } from "../core/NodeUI";
+
+export class MyNodeUI extends NodeUI {
+  render() {
+    const state = this.getState();
+    return (
+      // Your React JSX here
+      // Use this.executeAction(actionType, payload) to trigger actions
+    );
+  }
+}
+```
+
+### Registering UI with a Node
+
+```javascript
+const node = new Node(
+  "nodeName",
+  actions,
+  initialState,
+  MyNodeUI // Pass the UI class here
+);
+```
+
+### UI Features
+
+- Automatic state synchronization
+- Direct action execution
+- Real-time updates
+- Persistence across sessions
+- Dark/light mode support
+- Custom styling and layout
+- Material-UI integration

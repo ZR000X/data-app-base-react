@@ -1,17 +1,19 @@
 import { Node } from "../../../../../core/Node";
-import { levelUpAction } from "../actions/levelUp";
 import { gainExperienceAction } from "../actions/gainExperience";
+import { levelUpAction } from "../actions/levelUp";
+import { CharacterUI } from "../ui/CharacterUI";
 
-export class CharacterNode extends Node {
-  constructor(name) {
-    super(name, [levelUpAction, gainExperienceAction], {
+export function createCharacterNode(name) {
+  return new Node(
+    name,
+    [gainExperienceAction, levelUpAction],
+    {
       level: 1,
       experience: 0,
       strength: 10,
       dexterity: 10,
       intelligence: 10,
-    });
-  }
+    },
+    CharacterUI
+  );
 }
-
-export const createCharacterNode = (name) => new CharacterNode(name);

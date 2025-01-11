@@ -7,6 +7,7 @@ import { exampleWorld } from "./worlds/example";
 import { IconButton, Tooltip } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
 import DownloadIcon from "@mui/icons-material/Download";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 // In a real app, you'd import multiple worlds
 const worlds = [exampleWorld];
@@ -162,6 +163,23 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
+  const handleReset = () => {
+    // Clear localStorage
+    localStorage.removeItem("masterState");
+
+    // Reset master state
+    setMasterState({});
+
+    // Reset all nodes to their initial states
+    worlds.forEach((world) => {
+      world.systems.forEach((system) => {
+        system.nodes.forEach((node) => {
+          node.setState(node.getInitialState());
+        });
+      });
+    });
+  };
+
   const theme = createTheme({
     palette: {
       mode: darkMode ? "dark" : "light",
@@ -204,6 +222,11 @@ function App() {
               accept="application/json"
               onChange={handleUpload}
             />
+            <Tooltip title="Reset State">
+              <IconButton size="small" color="primary" onClick={handleReset}>
+                <RefreshIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Upload State">
               <IconButton
                 size="small"
