@@ -230,7 +230,23 @@ export function TopBar({
 
   const handleStateChange = (value) => {
     setNodeState(value);
-    validateJson(value, setStateError);
+    try {
+      const newState = JSON.parse(value);
+      setStateError(false);
+
+      // Update the node's state
+      selectedNode.setState(newState);
+
+      // Update master state
+      onNodeStateChange(
+        selectedWorld.name,
+        selectedSystem.name,
+        selectedNode.name,
+        newState
+      );
+    } catch (error) {
+      setStateError(true);
+    }
   };
 
   const handleAction = (actionType) => {
