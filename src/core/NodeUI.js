@@ -1,13 +1,18 @@
+import React from "react";
+
 /**
  * @typedef {import('./Node').Node} Node
  */
 
-export class NodeUI {
+export class NodeUI extends React.Component {
   /**
    * @param {Node} node The node this UI represents
    */
   constructor(node) {
+    super();
     this.node = node;
+    // Initialize with empty state
+    this.state = {};
   }
 
   /**
@@ -15,7 +20,8 @@ export class NodeUI {
    * @returns {JSX.Element}
    */
   render() {
-    throw new Error("NodeUI must implement render()");
+    console.error("NodeUI must implement render()");
+    return null;
   }
 
   /**
@@ -41,5 +47,22 @@ export class NodeUI {
    */
   getState() {
     return this.node.getState();
+  }
+
+  /**
+   * Set UI-specific state
+   * @param {Object} update
+   */
+  setUIState(update) {
+    // Directly update state without nesting
+    this.setState(update);
+  }
+
+  /**
+   * Get UI-specific state
+   * @returns {Object}
+   */
+  getUIState() {
+    return this.state.uiState;
   }
 }
